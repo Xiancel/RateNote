@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 type ItemHandler struct {
@@ -77,6 +78,23 @@ func (h *ItemHandler) ListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondJSON(w, http.StatusOK, response)
+}
+
+func (h *ItemHandler) GetItem(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	item, err := h.ItemSrv.GetItem(r.Context(), id)
+	if err != nil {
+		handleServiceItemError(w, err)
+		return
+	}
+
+	respondJSON(w, http.StatusOK, item)
 }
 
 func handleServiceItemError(w http.ResponseWriter, err error) {
