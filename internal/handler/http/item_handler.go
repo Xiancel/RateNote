@@ -2,6 +2,7 @@ package http
 
 import (
 	itemSrv "RateNote/internal/service/item"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -22,9 +23,9 @@ func (h *ItemHandler) RegisterRoutes(r chi.Router) {
 	r.Group(func(r chi.Router) {
 		r.Get("/items", h.ListItem)
 		r.Get("/items/{id}", h.GetItem)
-		r.Post("/items", r.AddItem)
-		r.Put("/items/{id}", r.UpdateItem)
-		r.Delete("/items/{id}", r.DeleteItem)
+		r.Post("/items", h.AddItem)
+		r.Put("/items/{id}", h.UpdateItem)
+		r.Delete("/items/{id}", h.DeleteItem)
 	})
 }
 
@@ -95,6 +96,62 @@ func (h *ItemHandler) GetItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusOK, item)
+}
+
+func (h *ItemHandler) AddItem(w http.ResponseWriter, r *http.Request) {
+	var req itemSrv.CreateItemRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid body")
+		return
+	}
+
+	item, err := h.ItemSrv.AddItem(r.Context(), req)
+	if err != nil {
+		handleServiceItemError(w, err)
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, item)
+}
+
+func (h *ItemHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	var req itemSrv.UpdateItemRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid body")
+		return
+	}
+
+	item, err := h.ItemSrv.UpdateItem(r.Context(), id, req)
+	if err != nil {
+		handleServiceItemError(w, err)
+		return
+	}
+	respondJSON(w, http.StatusOK, item)
+}
+
+func (h *ItemHandler) DeleteItem(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if err := h.ItemSrv.DeleteItem(r.Context(), id); err != nil {
+		handleServiceItemError(w, err)
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]string{
+		"message": "Item deleted succesfully",
+	})
 }
 
 func handleServiceItemError(w http.ResponseWriter, err error) {
