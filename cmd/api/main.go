@@ -26,8 +26,8 @@ func main() {
 	dbUser := getEnv("DB_USER", "user")
 	dbPassword := getEnv("DB_PASSWORD", "1234!")
 	dbName := getEnv("DB_NAME", "ratenote_db")
-	dbSSLMode := getEnv("DB_SSLMODE", "")
-	ServerPort := getEnv("APP_PORT", "8080")
+	dbSSLMode := getEnv("DB_SSLMODE", "disable")
+	serverPort := getEnv("APP_PORT", "8080")
 
 	dbConf := db.Config{
 		Host:     dbHost,
@@ -57,7 +57,7 @@ func main() {
 	log.Println("Http router initialized")
 
 	server := http.Server{
-		Addr:         ":" + ServerPort,
+		Addr:         ":" + serverPort,
 		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -65,8 +65,8 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("server starting on http://localhost:%s", ServerPort)
-		log.Printf("API documentation: http://localhost:%s/api/v1", ServerPort)
+		log.Printf("server starting on http://localhost:%s", serverPort)
+		log.Printf("API base URL: http://localhost:%s/api/v1", serverPort)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
