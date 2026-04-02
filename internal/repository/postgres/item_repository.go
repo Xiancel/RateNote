@@ -33,7 +33,7 @@ func (i *ItemRepo) AddItem(ctx context.Context, item *entity.Item) error {
 
 	query := `
 	INSERT INTO items(id,name,comment,rating,image_path,created_at,updated_at)
-	VALUES($1,$2,$3,$4,$5,$6,NOW(),NOW())
+	VALUES($1,$2,$3,$4,$5,NOW(),NOW())
 	`
 
 	_, err := i.db.ExecContext(ctx, query,
@@ -42,8 +42,6 @@ func (i *ItemRepo) AddItem(ctx context.Context, item *entity.Item) error {
 		item.Comment,
 		item.Rating,
 		item.ImagePath,
-		item.CreatedAt,
-		item.UpdatedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to add item: %w", err)

@@ -13,5 +13,5 @@ type Item struct {
 	Rating    float64   `db:"rating" json:"rating"`
 	ImagePath string    `db:"image_path" json:"image_path"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" json:"update_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

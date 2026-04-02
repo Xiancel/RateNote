@@ -4,6 +4,7 @@ import (
 	itemSrv "RateNote/internal/service/item"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -76,6 +77,7 @@ func (h *ItemHandler) ListItem(w http.ResponseWriter, r *http.Request) {
 	response, err := h.ItemSrv.ListItem(r.Context(), filter)
 	if err != nil {
 		handleServiceItemError(w, err)
+		log.Println("service error:", err)
 		return
 	}
 	respondJSON(w, http.StatusOK, response)
@@ -92,6 +94,7 @@ func (h *ItemHandler) GetItem(w http.ResponseWriter, r *http.Request) {
 	item, err := h.ItemSrv.GetItem(r.Context(), id)
 	if err != nil {
 		handleServiceItemError(w, err)
+		log.Println("service error:", err)
 		return
 	}
 
@@ -108,6 +111,7 @@ func (h *ItemHandler) AddItem(w http.ResponseWriter, r *http.Request) {
 	item, err := h.ItemSrv.AddItem(r.Context(), req)
 	if err != nil {
 		handleServiceItemError(w, err)
+		log.Println("service error:", err)
 		return
 	}
 
@@ -131,6 +135,7 @@ func (h *ItemHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	item, err := h.ItemSrv.UpdateItem(r.Context(), id, req)
 	if err != nil {
 		handleServiceItemError(w, err)
+		log.Println("service error:", err)
 		return
 	}
 	respondJSON(w, http.StatusOK, item)
@@ -146,6 +151,7 @@ func (h *ItemHandler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.ItemSrv.DeleteItem(r.Context(), id); err != nil {
 		handleServiceItemError(w, err)
+		log.Println("service error:", err)
 		return
 	}
 
