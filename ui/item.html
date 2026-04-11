@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Item Details</title>
+<style>
+body {background: #0f1115; color: white; font-family: Arial; max-width: 600px; margin: auto; padding: 20px;}
+.card {background: #1a1d24; padding: 20px; border-radius: 8px;}
+button {background: #3b82f6; border: none; padding: 10px; color: white; border-radius: 6px; cursor: pointer;}
+img {margin-top: 10px; max-width: 100%;}
+</style>
+</head>
+<body>
+<div class="card">
+    <h1>{{.Name}}</h1>
+    <p>Rating: {{.Rating}}</p>
+    <p>{{.Comment}}</p>
+    {{if .ImagePath}}<img src="{{.ImagePath}}" alt="Item image">{{end}}
+    <div style="margin-top: 10px;">
+        <button onclick="window.location.href='/edit/{{.ID}}'">Update</button>
+        <form method="POST" action="/delete/{{.ID}}" style="display:inline;">
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+</div>
+<div style="margin-top:20px;">
+    <a href="/home">Back to List</a>
+</div>
+</body>
+</html>

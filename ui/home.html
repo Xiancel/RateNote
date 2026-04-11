@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Items</title>
+
+<style>
+body {
+    background: #0f1115;
+    color: white;
+    font-family: Arial;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: #1a1d24;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Items</title>
+
+<style>
+body {
+    background: #0f1115;
+    color: white;
+    font-family: Arial;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: #1a1d24;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Items List</h1>
+
+<input placeholder="Search..." />
+
+{{range .Items}}
+<div class="card">
+    <h3>{{.Name}}</h3>
+    <p>{{.Rating}}</p>
+    <p>{{.Comment}}</p>
+    <a href="/item/{{.ID}}">Open</a>
+</div>
+{{else}}
+<p>No items found</p>
+{{end}}
+
+</body>
+</html>
