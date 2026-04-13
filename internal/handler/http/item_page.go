@@ -3,6 +3,7 @@ package http
 import (
 	itemSrv "RateNote/internal/service/item"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	"github.com/go-chi/chi/v5"
@@ -44,4 +45,62 @@ func (h *ItemPageHandler) GetItemPage(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("ui/item.html"))
 	tmpl.Execute(w, item)
+}
+
+func (h *ItemPageHandler) EditItemPage(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if r.Method == http.MethodGet {
+		item, _ := h.ItemSrv.GetItem(r.Context(), id)
+		tmpl := template.Must(template.ParseFiles("templates/edit.html"))
+		tmpl.Execute(w, item)
+		return
+	}
+	name := r.FormValue("name")
+	comm := r.FormValue("comm")
+	ratingStr := r.FormValue("rating")
+	imagepath := r.FormValue("image_path")
+
+	rating, err := strconv.ParseFloat(ratingStr, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid max_rating")
+		return
+	}
+	r.ParseForm()
+	updReq := itemSrv.UpdateItemRequest{
+		Name:      &name,
+		Comment:   &comm,
+		Rating:    &rating,
+		ImagePath: &imagepath,
+	}
+
+	_, err = h.ItemSrv.UpdateItem(r.Context(), id, updReq)
+	if err != nil {
+		http.Error(w, "Update failed", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+}
+
+func (h *ItemPageHandler) DeleteItemPage(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if err := h.ItemSrv.DeleteItem(r.Context(), id); err != nil {
+		http.Error(w, "Delete failed", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
