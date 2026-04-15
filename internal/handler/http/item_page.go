@@ -25,8 +25,7 @@ func (h *ItemPageHandler) ListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("ui/home.html"))
-	tmpl.Execute(w, items)
+	render(w, "ui/home.html", items)
 }
 
 func (h *ItemPageHandler) GetItemPage(w http.ResponseWriter, r *http.Request) {
@@ -43,8 +42,7 @@ func (h *ItemPageHandler) GetItemPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("ui/item.html"))
-	tmpl.Execute(w, item)
+	render(w, "ui/item.html", item)
 }
 
 func (h *ItemPageHandler) EditItemPage(w http.ResponseWriter, r *http.Request) {
@@ -56,13 +54,18 @@ func (h *ItemPageHandler) EditItemPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		item, _ := h.ItemSrv.GetItem(r.Context(), id)
-		tmpl := template.Must(template.ParseFiles("templates/edit.html"))
-		tmpl.Execute(w, item)
+		item, err := h.ItemSrv.GetItem(r.Context(), id)
+		if err != nil {
+			http.Error(w, "Item not found", http.StatusNotFound)
+			return
+		}
+		render(w, "ui/edit.html", item)
 		return
 	}
+	r.ParseForm()
+
 	name := r.FormValue("name")
-	comm := r.FormValue("comm")
+	comm := r.FormValue("comment")
 	ratingStr := r.FormValue("rating")
 	imagepath := r.FormValue("image_path")
 
@@ -71,7 +74,7 @@ func (h *ItemPageHandler) EditItemPage(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "Invalid max_rating")
 		return
 	}
-	r.ParseForm()
+
 	updReq := itemSrv.UpdateItemRequest{
 		Name:      &name,
 		Comment:   &comm,
@@ -103,4 +106,50 @@ func (h *ItemPageHandler) DeleteItemPage(w http.ResponseWriter, r *http.Request)
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *ItemPageHandler) AddItemPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		render(w, "ui/add.html", nil)
+		return
+	}
+	name := r.FormValue("name")
+	comm := r.FormValue("comment")
+	ratingStr := r.FormValue("rating")
+	imagepath := r.FormValue("image_path")
+
+	rating, err := strconv.ParseFloat(ratingStr, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid max_rating")
+		return
+	}
+
+	createReq := itemSrv.CreateItemRequest{
+		Name:      name,
+		Comment:   comm,
+		Rating:    rating,
+		ImagePath: imagepath,
+	}
+
+	_, err = h.ItemSrv.AddItem(r.Context(), createReq)
+	if err != nil {
+		http.Error(w, "Create Item failed", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func render(w http.ResponseWriter, file string, data any) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	tmpl, err := template.ParseFiles(file)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
