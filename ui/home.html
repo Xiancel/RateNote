@@ -20,43 +20,43 @@ body {
     margin-bottom: 10px;
     border-radius: 8px;
 }
-</style>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Items</title>
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-<style>
-body {
-    background: #0f1115;
+button {
+    background: #3b82f6;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
     color: white;
-    font-family: Arial;
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
+    cursor: pointer;
 }
 
-.card {
-    background: #1a1d24;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
+button:hover {
+    background: #2563eb;
 }
 </style>
-
 </head>
+
 <body>
 
-<h1>Items List</h1>
+<div class="header">
+    <h1>Items List</h1>
+    <a href="/add">
+        <button>Add Item</button>
+    </a>
+</div>
 
 <input placeholder="Search..." />
 
 {{range .Items}}
 <div class="card">
     <h3>{{.Name}}</h3>
-    <p>{{.Rating}}</p>
+    <p>Rating: {{.Rating}}</p>
     <p>{{.Comment}}</p>
     <a href="/item/{{.ID}}">Open</a>
 </div>
