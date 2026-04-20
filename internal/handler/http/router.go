@@ -31,6 +31,14 @@ func NewRouter(cfg RouteConfig) *chi.Mux {
 	r.Get("/", itemPageHandler.ListItem)
 	r.Get("/item/{id}", itemPageHandler.GetItemPage)
 
+	r.Get("/add", itemPageHandler.AddItemPage)
+	r.Post("/item", itemPageHandler.AddItemPage)
+
+	r.Get("/edit/{id}", itemPageHandler.EditItemPage)
+	r.Post("/item/{id}", itemPageHandler.EditItemPage)
+
+	r.Post("/delete/{id}", itemPageHandler.DeleteItemPage)
+
 	r.Route("/api/v1", func(r chi.Router) {
 		itemHandler := NewItemHandler(cfg.ItemService)
 		itemHandler.RegisterRoutes(r)
