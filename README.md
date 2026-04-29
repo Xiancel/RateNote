@@ -20,7 +20,15 @@ cd RateNote
 docker-compose --profile dev up --build
 
 ```
+# API Endpoints
 
+```
+GET    /api/v1/items     - list items
+GET    /api/v1/items/:id - get item by id
+POST   /api/v1/items     - add item
+PUT    /api/v1/items/:id - update item
+DELETE /api/v1/items/:id - delete item
+```
 # Project diagram
 
 Clean Architecture (simplified)
